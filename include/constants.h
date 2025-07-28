@@ -1,0 +1,9 @@
+#ifndef CONSTANTS_H
+#define CONSTANTS_H
+
+#define RESOLUTION  5
+#define PI 3.141592653589793
+#define ARC_EPSILON 0.01f  
+
+
+#endif // CONSTANTS_H
