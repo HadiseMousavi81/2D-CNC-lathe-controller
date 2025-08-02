@@ -1,6 +1,10 @@
 // Drivers/stepgen.c
-#include "stepgen.h"
+#include "drivers/stepgen.h"
 #include "config.h"
+#include "Drivers/gpio.h"
+
+
+
 
 volatile uint32_t step_index = 0;
 bool update_needed = false;

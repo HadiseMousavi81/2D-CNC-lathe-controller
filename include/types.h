@@ -11,3 +11,7 @@ typedef struct {
     int cw;
     float x_end, y_end;
 } arc_t;
+
+// state motion_state.h 
+
+#endif // TYPES_H
