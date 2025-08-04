@@ -9,6 +9,7 @@ extern bool update_needed;
 extern uint32_t Target_Delay;
 extern uint32_t Start_Delay , current_delay;
 extern enum { STATE_IDLE, STATE_PREPARING, STATE_ACCEL, STATE_CRUISE, STATE_DEACCEL, STATE_DONE } motion_state;
+extern int x2 , y2 , y1 , x1
 
 void Calc_StepDelay(uint32_t stepindex, uint8_t op) {
 uint32_t current_delay = 0;
@@ -64,7 +65,8 @@ switch(motion_state) {
 
  
     case STATE_DONE:
-          return ; 
+        x2 = x1 ;
+        y2 = y1 ;
           break;
 
     default:  
