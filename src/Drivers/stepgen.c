@@ -7,38 +7,47 @@
 
 
 volatile uint32_t step_index = 0;
-bool update_needed = false;
-int step_state = 0;
-int step_statey = 0;
+bool update_neededx = false;
+bool update_neededy = false;
 
-void Step_x() {
-    GPIOA->ODR |= GPIO_ODR_ODR0;
-    step_state = 0;
-}
 
-void Step_y() {
-    GPIOB->ODR |= GPIO_ODR_ODR0;
-    step_statey = 0;
-}
 
-void TIM2_IRQHandler(void) {
-    if (TIM2->SR & TIM_SR_CC1IF) {
-        TIM2->SR &= ~TIM_SR_CC1IF;
-        if (step_state == 0) {
-            GPIOA->ODR &= ~GPIO_ODR_ODR0;
+
+// ---- ISR: Generate Step X Pulse ----
+volatile bool step_statex = false;
+
+void TIM2_UP_IRQHandler(void) {
+    if (TIM2->SR & TIM_SR_UIF) {
+        TIM2->SR &= ~TIM_SR_UIF;
+
+        if (!step_state) {
+            GPIOA->ODR |= STEP_PIN;   // Set high
+            step_statex = true;
+        } else {
+            GPIOA->ODR &= ~STEP_PIN;  // Set low
+            step_statex = false;
             step_index++;
-            update_needed = true;
+            update_neededx = true;
         }
     }
 }
 
-void TIM3_IRQHandler(void) {
-    if (TIM3->SR & TIM_SR_CC1IF) {
-        TIM3->SR &= ~TIM_SR_CC1IF;
-        if (step_statey == 0) {
-            GPIOB->ODR &= ~GPIO_ODR_ODR0;
+
+// ---- ISR: Generate Step Y Pulse ----
+volatile bool step_statey = false;
+
+void TIM3_UP_IRQHandler(void) {
+    if (TIM3->SR & TIM_SR_UIF) {
+        TIM3->SR &= ~TIM_SR_UIF;
+
+        if (!step_statey) {
+            GPIOB->ODR |= STEP_PIN;   // Set high
+            step_state = true;
+        } else {
+            GPIOB->ODR &= ~STEP_PIN;  // Set low
+            step_statey = false;
             step_index++;
-            update_needed = true;
+            update_neededy = true;
         }
     }
-}
+}}
