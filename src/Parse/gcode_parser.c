@@ -52,25 +52,40 @@ void executeBlock(void){
 }
 
 // ---  G-code ---
+
 void processGcodeLine(char *gcodeText) {
+    if (gcodeText == NULL) {
+        ErrorHandler(ERR_NULL_POINTER);
+        return;
+    }
+
     linePtr = gcodeText;
     wordIndex = 0;
+    blockReady = 0;
 
     while (*linePtr) {
-        if (*linePtr == ' ' || *linePtr == '\n') {
-            wordBuf[wordIndex] = '\0'; 
+        if (*linePtr == ' '  *linePtr == '\t'  *linePtr == '\n') {
             if (wordIndex > 0) {
+                wordBuf[wordIndex] = '\0';
                 parseToken(wordBuf);
                 wordIndex = 0;
             }
-        if (*linePtr == '\n') {  
-                blockReady = 1;       
-                executeBlock();       
-                memset(&gcodeBlock, 0, sizeof(gcodeBlock)); 
+            if (*linePtr == '\n') {
+                blockReady = 1;
             }
-        } else {  
-            wordBuf[wordIndex++] = *linePtr;
-        }  
-        linePtr++;  
+        } else if (isprint(*linePtr)) {
+            if (wordIndex < MAX_WORD_LEN - 1)
+                wordBuf[wordIndex++] = *linePtr;
+            else {
+                ErrorHandler(ERR_BUFFER_OVERFLOW);
+                return;
+            }
+        }
+        linePtr++;
+    }
+
+    if (blockReady) {
+        executeBlock();
+        memset(&gcodeBlock, 0, sizeof(gcodeBlock));
     }
 }
