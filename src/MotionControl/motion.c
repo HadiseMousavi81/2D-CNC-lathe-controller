@@ -13,6 +13,7 @@ static enum {
     STATE_ACCEL,
     STATE_CRUISE,
     STATE_DEACCEL,
+    STATE_ERROR,
     STATE_DONE,
 } MotionState
 
