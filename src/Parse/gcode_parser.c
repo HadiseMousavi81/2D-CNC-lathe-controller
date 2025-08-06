@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include "gcode_parser.h"
 #include "mcode_actions.h"
-
+#include "error_manager.h"
 
 
 static char *linePtr;
@@ -28,27 +28,54 @@ void parseToken(char *tokenCode) {
     }        
 }
 
-void executeBlock(void){  
-    if(blockReady){  
-        switch(gcodeBlock.gCode) {  
-            case 0: moveto(gcodeBlock.x, gcodeBlock.y, 0); break;  
-            case 1: movetp(gcodeBlock.x, gcodeBlock.y, gcodeBlock.feed); break;  
-            case 2: DrawArc(gcodeBlock.x, gcodeBlock.y, gcodeBlock.i, gcodeBlock.j, 1, gcodeBlock.feed); break;  
-            case 3: DrawArc(gcodeBlock.x, gcodeBlock.y, gcodeBlock.i, gcodeBlock.j, 0, gcodeBlock.feed); break;  
-        }  
+bool Gcode_validate(int gcode){
+  if ( gcode==0  gcode==1  gcode==2  gcode==3  gcode==90 || gcode==91){
+    return true;
+  } else {
+   
+    return false;
+  }
+}
 
-         switch(gcodeBlock.mCode) {
-            case 3: spindleOnCW(); break;    // M3
-            case 4: spindleOnCCW(); break;   // M4
-            case 5: spindleOff(); break;     // M5
-            case 7: coolant1On(); break;     // M7
-            case 8: coolant2On(); break;     // M8
-            case 9: coolantAllOff(); break;  // M9
-            case 2:                         // M2
-            case 30: programEnd(); break;    // M30
-            
-        blockReady = 0;
+
+bool Mcode_validate(int mcode){
+  if ( mcode==4  mcode==5  mcode==2  mcode==3  mcode==30  mcode==9  mcode==8){
+    return true;
+  } else {
+    
+    return false;
+  }
+}
+
+void executeBlock(void){
+    if(!Gcode_validate(gcodeBlock.gCode)) {
+        ErrorHandler(ERR_UNSUPPORTED_GCODE);
     }
+elseif(!Mcode_validate(gcodeBlock.mCode)) {
+        ErrorHandler(ERR_UNSUPPORTED_MCODE);
+    }
+    
+    if(blockReady){
+       switch(gcodeBlock.gCode) {
+case 0: moveto(gcodeBlock.x, gcodeBlock.y, 0); break;
+case 1: movetp(gcodeBlock.x, gcodeBlock.y, gcodeBlock.feed); break;
+case 2: DrawArc(gcodeBlock.x, gcodeBlock.y, gcodeBlock.i, gcodeBlock.j, 1, gcodeBlock.feed); break;
+case 3: DrawArc(gcodeBlock.x, gcodeBlock.y, gcodeBlock.i, gcodeBlock.j, 0, gcodeBlock.feed); break;
+}
+
+switch(gcodeBlock.mCode) {  
+        case 3: spindleOnCW(); break;    // M3  
+        case 4: spindleOnCCW(); break;   // M4  
+        case 5: spindleOff(); break;     // M5  
+        case 7: coolant1On(); break;     // M7  
+        case 8: coolant2On(); break;     // M8  
+        case 9: coolantAllOff(); break;  // M9  
+        case 2:                         // M2  
+        case 30: programEnd(); break;    // M30  
+          
+    blockReady = 0;  
+}
+
 }
 
 // ---  G-code ---
