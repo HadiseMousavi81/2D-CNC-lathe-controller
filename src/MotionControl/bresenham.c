@@ -63,6 +63,9 @@ switch(motion_state) {
                }  
         break;  
 
+    case STATE_ERROR:
+         ShowErrorIndicator();
+         break;
  
     case STATE_DONE:
         x2 = x1 ;
